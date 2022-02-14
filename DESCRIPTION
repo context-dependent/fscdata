@@ -1,13 +1,13 @@
 Package: fscdata
-Title: What the Package Does (One Line, Title Case)
+Title: FSC Evaluation Database Toolkit
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Thomas",
+           family = "McManus",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "tmcmanus@blueprint-ade.ca")
+Description: This package provides tools to make it easier to work with data from our evlauation database for FSC Projects. 
+    Presently downloads and names records in a sensible way, but a coming development roadmap will include helpful cleaning utility functions. 
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
@@ -16,8 +16,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     dplyr (>= 1.0.7),
+    glue,
     haven (>= 2.4.3),
     lubridate (>= 1.7.10),
+    purrr (>= 0.3.4),
     qualtr,
     salesforcer (>= 1.0.0),
     tidyr (>= 1.1.3)
