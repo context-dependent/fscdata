@@ -17,7 +17,8 @@
 
 sf_read_fsc <- function(programs = NULL) {
     d_enrollments <- sf_read_enrollments(programs)
-    d_surveys <- sf_read_program_surveys(programs)
+    d_surveys <- sf_read_program_surveys(programs) |>
+        sf_read_qx_responses()
     d_components <- sf_read_program_components(programs)
 
     ls_program_data <- list(
@@ -29,7 +30,7 @@ sf_read_fsc <- function(programs = NULL) {
     return(ls_program_data)
 }
 
-sf_read_enrollments <- function(programs = NULL) {
+sf_read_enrollments <- function(programs = NULL, drop_known_tests = TRUE) {
 
     q_where <- gen_where_program(programs, program_name_key = "Cohorts__r.Program__r.Name")
 
@@ -72,7 +73,16 @@ sf_read_enrollments <- function(programs = NULL) {
             assignment_id = AssignmentID__c
         )
 
-    return(enrollments_good_names)
+    if(drop_known_tests) {
+        res <- enrollments_good_names |>
+            dplyr::filter(
+                !str_detect(name, "(T|t)est|Samridhi|Bruce Wayne")
+            )
+    } else {
+        res <- enrollments_good_names
+    }
+
+    return(res)
 }
 
 sf_read_program_surveys <- function(programs = NULL) {
@@ -107,26 +117,44 @@ sf_read_program_surveys <- function(programs = NULL) {
             survey_id   = Program_SurveyAssessment__r.Program_Survey_ID__c, 
             response_id = Survey_Response_ID__c
         ) |>
-        dplyr::filter(!is.na(survey_id))
+        dplyr::filter(!is.na(survey_id)) |>
+        dplyr::filter(stringr::str_detect(survey_id, "^SV_[a-zA-Z0-9]{11,15}$")) |>
+        dplyr::group_nest(program, sf_survey_name, survey_id, .key = "enrollment_response_link") 
     
-    d_responses <- d_responses_empty |>
-        dplyr::group_nest(program, sf_survey_name, survey_id, .key = "enrollment_response_link") |>
+
+    return(d_responses_empty)
+
+}
+
+sf_read_qx_responses <- function(sf_response_data) {
+
+    safe_fetch_survey <- purrr::safely(qualtRics::fetch_survey)
+    safe_fetch_meta <- purrr::safely(qualtRics::metadata)
+    
+    d_responses <- sf_response_data |>
+        
         dplyr::mutate(
-            response_data = survey_id |>
+            qx_survey_meta = survey_id |>
                 purrr::map(
-                    qualtr::get_responses_v2
-                )  |>
-                purrr::map2(
-                    enrollment_response_link, 
-                    function(x, y) {
-                        dplyr::left_join(y, x) 
-                    }
+                    safe_fetch_meta,  
+                    verbose = FALSE
+                ) |>
+                purrr::map(
+                    ~ .x$result
+                ),
+            response_data_export = survey_id |>
+                purrr::map(
+                   safe_fetch_survey, 
+                   verbose = FALSE
+                ) |>
+                purrr::map(
+                    ~ .x$result
                 )
-        ) |>
-        dplyr::select(-enrollment_response_link)
+        )  
+
+
 
     return(d_responses)
-
 }
 
 sf_read_program_components <- function(programs = NULL) {
@@ -178,3 +206,22 @@ gen_where_program <- function(programs = NULL, program_name_key = NULL) {
     
 }
 
+
+qx_get_survey_meta <- function(id) {
+    
+    url <- glue::glue("{Sys.getenv('QUALTRICS_ROOT_URL')}/API/v3/survey-definitions/{id}/metadata")
+
+    req <- httr::GET(url = url, httr::add_headers(qualtr::headers()))
+
+    res <- httr::content(req)
+
+    return(res)
+}
+
+qx_get_survey_name <- function(id) {
+    meta <- qx_get_survey_meta(id)
+
+    survey_name <- meta$result$SurveyName
+
+    return(survey_name)
+}

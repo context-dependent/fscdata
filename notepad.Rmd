@@ -1,0 +1,74 @@
+---
+output: github_md
+---
+
+# Data Cleaning Log: First 16
+
+## Programs in Scope
+
+
+| name | status | in data |
+|:-----|:-------|:--------|
+| FAST | Scaling | Yes | 
+| EDGE UP | Scaling | Yes | 
+| Digital Competencies (ADAPT) | Scaling | Yes |
+| FUSION | Over | Yes |
+| CLIMB | Over | Yes | 
+| Career Moves | Over | Yes |   
+| UFCW | Over | Partial (Pre-app) | 
+| WBL | Over | No (Not in EDB) | 
+| BOLD | Over | No |
+| Actua | Over | Not Suitable for Linkage | 
+| I-ICT | Over | Not Suitable for Linkage | 
+| Be EPIC | Over | No | 
+| Project Integrate | Over | No | 
+| Learning Shock | Over | No | 
+| Truckers | Over | No | 
+| UOIT | Over | No | 
+
+
+- We have full or partial samples of linkable intake data for 8 of the first 16 programs 
+- We have never collected or held microdata for 6
+- 2 of the projects had intake surveys specifically designed to obfuscate identity (Actua, I-ICT)
+
+## Linkage Variables
+
+- `lnk_name` Participant Name
+- `lnk_date_of_birth` Participant DOB
+- `lnk_sex` Sex
+
+## Enrollment Info
+
+Enrollment info is drawn mostly from the Sf EDB.
+Caution advised when interpreting `program_completed`, 
+as completion was entered inconsistently. 
+
+- `program_name_sf` Program Name in the Sf EDB
+- `program_name_qx` Program Name slug from Qx
+- `cohort_name` Cohort Name in Sf EDB
+- `cohort_start_date, cohort_end_date` Cohort Start and End Dates
+- `program_completed` Completed program requirements in Sf EDB
+
+## Demographic Info
+
+Demographic Info for most programs is drawn from 
+the program's intake survey. For FAST, some fields 
+are populated using administrative data. 
+
+- `dem_age_at_enrollment`
+- `dem_indigenous`
+- `dem_newcomer`
+- `dem_esl` 
+- `dem_fols` 
+- `dem_educ_highest`
+- `dem_educ_foreign`
+- `dem_marital`
+- `dem_parent` 
+
+## Satisfaction and Usefulness
+
+Satisfaction and usefulness are generally collected on the exit survey. 
+Questions are tailored to each program, so I'm not sure what the approach should be 
+for generalizing. Will probably end up including on a program by program basis. 
+
+## Notes
