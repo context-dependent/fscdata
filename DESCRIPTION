@@ -6,6 +6,10 @@ Authors@R:
            family = "McManus",
            role = c("aut", "cre"),
            email = "tmcmanus@blueprint-ade.ca")
+    person(given = "Alex", 
+           family = "Rand", 
+           role = "aut", 
+           email = "arand@blueprint-ade.ca")
 Description: This package provides tools to make it easier to work with data from our evlauation database for FSC Projects. 
     Presently downloads and names records in a sensible way, but a coming development roadmap will include helpful cleaning utility functions. 
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
