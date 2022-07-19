@@ -76,7 +76,7 @@ sf_read_enrollments <- function(programs = NULL, drop_known_tests = TRUE) {
     if(drop_known_tests) {
         res <- enrollments_good_names |>
             dplyr::filter(
-                !str_detect(name, "(T|t)est|Samridhi|Bruce Wayne")
+                !stringr::str_detect(name, "(T|t)est|Samridhi|Bruce Wayne")
             )
     } else {
         res <- enrollments_good_names
