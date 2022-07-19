@@ -134,25 +134,26 @@ sf_read_qx_responses <- function(sf_response_data) {
     d_responses <- sf_response_data |>
         
         dplyr::mutate(
-            qx_survey_meta = survey_id |>
+            qx_survey_meta_safe = survey_id |>
                 purrr::map(
-                    safe_fetch_meta,  
+                    safe_fetch_meta,
                     verbose = FALSE
-                ) |>
-                purrr::map(
-                    ~ .x$result
                 ),
-            response_data_export = survey_id |>
+            qx_survey_meta = qx_survey_meta_safe |>
+                purrr::map('result'),
+            qx_survey_meta_err = qx_survey_meta_safe |>
+                purrr::map('error'),
+            response_data_export_safe = survey_id |>
                 purrr::map(
                    safe_fetch_survey, 
                    verbose = FALSE
-                ) |>
-                purrr::map(
-                    ~ .x$result
-                )
-        )  
-
-
+                ), 
+            response_data_export = response_data_export_safe |>
+                purrr::map('result'),
+            response_data_export_err = response_data_export_safe |>
+                purrr::map('error')
+        ) |>
+        dplyr::select(-matches("_safe"))
 
     return(d_responses)
 }
